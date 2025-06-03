@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "930323550079",
+    "project_id": "kbc-yt-4fdc6",
+    "storage_bucket": "kbc-yt-4fdc6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:930323550079:android:9f6e636f11ec104d77144a",
+        "android_client_info": {
+          "package_name": "com.example.kbc_app_yt"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqb63OS4hPFqD7EPjDwBMOtuTKUgQyrpY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
