@@ -3,6 +3,7 @@ import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:kbc_app_yt/services/auth.dart';
 import 'package:kbc_app_yt/services/internetCon.dart';
+import 'package:kbc_app_yt/views/home.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 class Login extends StatefulWidget {
@@ -45,6 +46,10 @@ class _LoginState extends State<Login> {
               Buttons.GoogleDark,
               onPressed: () async {
                 await signWithGoogle();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => Home()),
+                );
               },
             ),
             SizedBox(height: 10),
