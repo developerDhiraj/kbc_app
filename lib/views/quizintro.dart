@@ -1,16 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/material/colors.dart';
+import 'package:kbc_app_yt/views/checkQuizUnlock.dart';
 
-class QuizIntro extends StatelessWidget {
-  const QuizIntro({super.key});
+class QuizIntro extends StatefulWidget {
+  String quizName;
+  String quizImgUrl;
+  String quizTopics;
+  String quizDuration;
+  String quizAbout;
+  String QuizId;
 
+  QuizIntro({
+      required this.quizName,
+      required this.quizImgUrl,
+      required this.quizTopics,
+      required this.quizDuration,
+      required this.quizAbout,
+      required this.QuizId
+  }
+      );
+  @override
+  State<QuizIntro> createState() => _QuizIntroState();
+}
+
+class _QuizIntroState extends State<QuizIntro> {
+    bool quizIsUnlock = false;
+  getQuizUnlockStatus()async{
+    await CheckQuizUnlock.checkQuizUnlockStatus(widget.QuizId).then((unlockStatus){
+      setState(() {
+        getQuizUnlockStatus();
+        quizIsUnlock = unlockStatus;
+      });
+    });
+  }
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: ElevatedButton(
         onPressed: () {},
-        child: Text("Start Quiz", style: TextStyle(fontSize: 20)),
+        child: Text( quizIsUnlock ? "Start Quiz" : "Unlock Quiz", style: TextStyle(fontSize: 20)),
       ),
       appBar: AppBar(title: Text("KBC Quiz App")),
       body: SingleChildScrollView(
@@ -27,7 +63,7 @@ class QuizIntro extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "Quiz Name",
+                      widget.quizName,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 30,
@@ -38,7 +74,7 @@ class QuizIntro extends StatelessWidget {
                 ),
               ),
               Image.network(
-                "https://images.unsplash.com/photo-1747956895655-163ff55bdc6e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                widget.quizImgUrl,
                 fit: BoxFit.cover,
                 height: 230,
                 width: MediaQuery.of(context).size.width,
@@ -62,7 +98,7 @@ class QuizIntro extends StatelessWidget {
                       ],
                     ),
                     Text(
-                      "Science, Space, Astronomy, Rocket, ISRO",
+                      widget.quizTopics,
                       style: TextStyle(fontSize: 17),
                     ),
                   ],
@@ -86,7 +122,7 @@ class QuizIntro extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Text("10 Minutes", style: TextStyle(fontSize: 17)),
+                    Text("${widget.quizDuration} Minutes", style: TextStyle(fontSize: 17)),
                   ],
                 ),
               ),
@@ -109,7 +145,7 @@ class QuizIntro extends StatelessWidget {
                       ],
                     ),
                     Text(
-                      " sdfd sfd dfs  sfdfa fas fs  fddsfsda sfd fds dfd sfd dfs  sfdfa fas fs  fddsfsda sfd fds dfd sfd dfs  sfdfa fas fs  fddsfsda sfd fds dfd sfd dfs  sfdfa fas fs  fddsfsda sfd fds  ",
+                      widget.quizAbout,
                       style: TextStyle(fontSize: 17),
                     ),
                   ],

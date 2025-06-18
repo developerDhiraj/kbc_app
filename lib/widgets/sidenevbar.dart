@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:kbc_app_yt/services/localdb.dart';
 import 'package:kbc_app_yt/views/home.dart';
 import 'package:kbc_app_yt/views/login.dart';
 import 'package:kbc_app_yt/services/auth.dart';
+import 'package:kbc_app_yt/views/profile.dart';
 
 class SideNav extends StatelessWidget {
-  const SideNav({Key? key}) : super(key: key);
+  String name;
+  String money;
+  String rank;
+  String proUrl;
+  String level;
+  SideNav( @required this.name, @required this.money, @required this.rank, @required this.proUrl, @required this.level) ;
+
 
   @override
   Widget build(BuildContext context) {
@@ -14,66 +22,96 @@ class SideNav extends StatelessWidget {
         child: ListView(
           // padding:  EdgeInsets.symmetric(horizontal: 20),
           children: [
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: Row(
+            GestureDetector(
+              onTap: (){ Navigator.push(context, MaterialPageRoute(builder: (context)=> Profile(name: name,rank: rank,proUrl: proUrl, level: "12",money: money,)));},
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CircleAvatar(radius: 30, backgroundColor: Colors.white),
-                  SizedBox(width: 20),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Dhiraj Kumar",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                    child: Row(
+                      children: [
+                        CircleAvatar(radius: 30,backgroundImage: NetworkImage(proUrl),),
+                        SizedBox(width: 20),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              name,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              "Rs. $money",
+                              style: TextStyle(color: Colors.white, fontSize: 15),
+                            ),
+                          ],
                         ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(left: 25),
+                    child: Text(
+                      "Leaderboard - $rank th Rank",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 19,
+                        fontWeight: FontWeight.bold,
                       ),
-                      SizedBox(height: 10),
-                      Text(
-                        "Rs.50,000",
-                        style: TextStyle(color: Colors.white, fontSize: 15),
-                      ),
-                    ],
+                    ),
                   ),
                 ],
               ),
             ),
-            Container(
-              padding: EdgeInsets.only(left: 25),
-              child: Text(
-                "Leaderboard - 230th Rank",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 19,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            SizedBox(height: 48),
+
+            SizedBox(height: 24),
+            Divider(thickness: 1,indent: 10,endIndent: 10,),
+            SizedBox(height: 24),
             listItem(
               context: context,
-                path: MaterialPageRoute(builder: (BuildContext context) => Home()),
-                label: "DAILY QUIZ",
-                icon: Icons.quiz),
+              path: MaterialPageRoute(
+                builder: (BuildContext context) => Home(),
+              ),
+              label: "DAILY QUIZ",
+              icon: Icons.quiz,
+            ),
             listItem(
-                context: context,
-                path: MaterialPageRoute(builder: (BuildContext context) => Home()),
-                label: "Leaderboard", icon: Icons.leaderboard),
+              context: context,
+              path: MaterialPageRoute(
+                builder: (BuildContext context) => Home(),
+              ),
+              label: "Leaderboard",
+              icon: Icons.leaderboard,
+            ),
             listItem(
-                context: context,
-                path: MaterialPageRoute(builder: (BuildContext context) => Home()),
-                label: "How To Use", icon: Icons.question_answer),
+              context: context,
+              path: MaterialPageRoute(
+                builder: (BuildContext context) => Home(),
+              ),
+              label: "How To Use",
+              icon: Icons.question_answer,
+            ),
             listItem(
-                context: context,
-                path: MaterialPageRoute(builder: (BuildContext context) => Home()),
-                label: "About Us", icon: Icons.face),
+              context: context,
+              path: MaterialPageRoute(
+                builder: (BuildContext context) => Home(),
+              ),
+              label: "About Us",
+              icon: Icons.face,
+            ),
             listItem(
-                context: context,
-                path: MaterialPageRoute(builder: (BuildContext context) => Login()),
-                label: "Logout", icon: Icons.logout),
+              context: context,
+              path: MaterialPageRoute(
+                builder: (BuildContext context) => Login(),
+              ),
+              label: "Logout",
+              icon: Icons.logout,
+            ),
           ],
         ),
       ),
