@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/material/colors.dart';
+
+import 'package:kbc_app_yt/services/QuizDhanda.dart';
+import 'package:kbc_app_yt/services/quizQueCreator.dart';
 import 'package:kbc_app_yt/views/checkQuizUnlock.dart';
+import 'package:kbc_app_yt/views/question.dart';
 
 class QuizIntro extends StatefulWidget {
   String quizName;
@@ -9,15 +12,16 @@ class QuizIntro extends StatefulWidget {
   String quizDuration;
   String quizAbout;
   String QuizId;
-
+ String QuizPrice;
   QuizIntro({
       required this.quizName,
       required this.quizImgUrl,
       required this.quizTopics,
       required this.quizDuration,
       required this.quizAbout,
-      required this.QuizId
-  }
+      required this.QuizId,
+      required this.QuizPrice
+        }
       );
   @override
   State<QuizIntro> createState() => _QuizIntroState();
@@ -25,29 +29,53 @@ class QuizIntro extends StatefulWidget {
 
 class _QuizIntroState extends State<QuizIntro> {
     bool quizIsUnlock = false;
-  getQuizUnlockStatus()async{
+    getAllQuizzesAndCheckUnlock() async {
     await CheckQuizUnlock.checkQuizUnlockStatus(widget.QuizId).then((unlockStatus){
+      print("In quizintro : Unlock status for ${widget.QuizId} is: $unlockStatus");
       setState(() {
-        getQuizUnlockStatus();
         quizIsUnlock = unlockStatus;
       });
     });
   }
 
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    getAllQuizzesAndCheckUnlock();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: ElevatedButton(
-        onPressed: () {},
         child: Text( quizIsUnlock ? "Start Quiz" : "Unlock Quiz", style: TextStyle(fontSize: 20)),
-      ),
+        onPressed: () async {
+          quizIsUnlock
+              ?
+          // print("Quiz is already Unlocked")
+          // await QuizQueCreator.genQuizQue(widget.QuizId, 6000)
+          // print("Navigate to Question Page")
+          Navigator.push(context, MaterialPageRoute(builder: (context)=>Question(quizID: widget.QuizId, queMoney: 6000)))
+              : QuizDhandha.buyQuiz(QuizPrice : int.parse(widget.QuizPrice), QuizID : widget.QuizId).then((quizKharidLiya){
+            if(quizKharidLiya){
+              setState(() {
+                quizIsUnlock = true;
+              });
+            }
+            else{
+              return showDialog(context: context, builder: (context)=>AlertDialog(
+                title: Text("You don't have enough money to buy this quiz"),
+                actions: [
+                  TextButton(onPressed: (){
+                    Navigator.of(context).pop();
+                  }, child: Text("OK"))
+                ],
+              ));
+            }
+          });
+        }),
       appBar: AppBar(title: Text("KBC Quiz App")),
       body: SingleChildScrollView(
         child: Container(
@@ -123,6 +151,28 @@ class _QuizIntroState extends State<QuizIntro> {
                       ],
                     ),
                     Text("${widget.quizDuration} Minutes", style: TextStyle(fontSize: 17)),
+                  ],
+                ),
+              ),
+              quizIsUnlock ? Container() : Container(
+                padding: EdgeInsets.all(18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.money),
+                        SizedBox(width: 6),
+                        Text(
+                          "Money",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Text("Rs. ${widget.QuizPrice}", style: TextStyle(fontSize: 17)),
                   ],
                 ),
               ),

@@ -1,14 +1,79 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:kbc_app_yt/services/QuestionModel.dart';
+import 'package:kbc_app_yt/services/firedb.dart';
+import 'package:kbc_app_yt/services/quizQueCreator.dart';
+import 'package:kbc_app_yt/views/win.dart';
 import 'package:kbc_app_yt/widgets/lifeline_sidebar.dart';
 
+import 'loser.dart';
+
 class Question extends StatefulWidget {
-  const Question({super.key});
+  String quizID;
+  int queMoney;
+  Question({required this.quizID, required this.queMoney});
 
   @override
   State<Question> createState() => _QuestionState();
-}
+  }
+
 
 class _QuestionState extends State<Question> {
+
+  QuestionModel questionModel = new QuestionModel();
+  genQue() async {
+    final queData = await QuizQueCreator.genQuizQue(widget.quizID, widget.queMoney);
+
+
+    if (queData == null) {
+      // Show an alert if no question found
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text("No question found"),
+          content: Text("No question available for this money level."),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("OK"))
+          ],
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      questionModel.question = queData["Question"] ?? "No Question";
+      questionModel.correctAnswer = queData["correctAnswer"] ?? "";
+
+      List options = [
+        queData["opt1"] ?? "",
+        queData["opt2"] ?? "",
+        queData["opt3"] ?? "",
+        queData["opt4"] ?? "",
+      ];
+
+      options.shuffle();
+      questionModel.option1 = options[0];
+      questionModel.option2 = options[1];
+      questionModel.option3 = options[2];
+      questionModel.option4 = options[3];
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    genQue();
+    print("this is data from initState $genQue");
+  }
+
+  bool optALocked = false;
+  bool optBLocked = false;
+  bool optCLocked = false;
+  bool optDLocked = false;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -18,7 +83,7 @@ class _QuestionState extends State<Question> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          title: Text("Rs 20000", style: TextStyle(fontSize: 25)),
+          title: Text("Rs ${widget.queMoney}", style: TextStyle(fontSize: 25)),
           centerTitle: true,
         ),
         drawer: Lifeline_Drawer(),
@@ -62,24 +127,65 @@ class _QuestionState extends State<Question> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                "Question 1 - This is the first question. You name is _________.",
+
+
+
+                questionModel.question,
                 style: TextStyle(fontSize: 20),
                 textAlign: TextAlign.center,
               ),
             ),
+            InkWell(
+              onTap: (){
+                print("Double tab to lock the screen");
+              },
+              onLongPress: (){
+                setState(() {
+                  optALocked = true;
+                });
+                Future.delayed(Duration(seconds: 2),()async{
+                  if(questionModel.option4 == questionModel.correctAnswer){
+                    print("Badhiya Hai yaar");
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> Win(widget.queMoney, widget.quizID)));
+                  }else{
+                    await FireDB.updateMoney(widget.queMoney~/2);
+                    print("Bada dukh hua dekh kar");
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> Looser(wonMon: widget.queMoney~/2,correctAns: questionModel.correctAnswer,)));
+                  }
+                });
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                padding: EdgeInsets.all(14),
+                margin: EdgeInsets.symmetric(horizontal: 17, vertical: 5),
+                decoration: BoxDecoration(
+                  color: optALocked ? Colors.yellow.withAlpha(150) : Colors.purple.withAlpha(150),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child:Text(
+                  "A. ${questionModel.option1}",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white70,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
             Container(
               width: MediaQuery.of(context).size.width,
               padding: EdgeInsets.all(14),
               margin: EdgeInsets.symmetric(horizontal: 17, vertical: 5),
               decoration: BoxDecoration(
-                color: Colors.white.withAlpha(150),
+                color: Colors.purple.withAlpha(150),
                 borderRadius: BorderRadius.circular(30),
               ),
               child: Text(
-                "A. First Option",
+                "B. ${questionModel.option2}",
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.black54,
+                  color: Colors.white70,
                   fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.center,
@@ -90,14 +196,14 @@ class _QuestionState extends State<Question> {
               padding: EdgeInsets.all(14),
               margin: EdgeInsets.symmetric(horizontal: 17, vertical: 5),
               decoration: BoxDecoration(
-                color: Colors.green.withAlpha(200),
+                color: Colors.purple.withAlpha(150),
                 borderRadius: BorderRadius.circular(30),
               ),
               child: Text(
-                "B. Second Option",
+                "C. ${questionModel.option3}",
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.black54,
+                  color: Colors.white70,
                   fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.center,
@@ -108,32 +214,14 @@ class _QuestionState extends State<Question> {
               padding: EdgeInsets.all(14),
               margin: EdgeInsets.symmetric(horizontal: 17, vertical: 5),
               decoration: BoxDecoration(
-                color: Colors.yellow.withAlpha(150),
+                color: Colors.purple.withAlpha(150),
                 borderRadius: BorderRadius.circular(30),
               ),
               child: Text(
-                "C. Third Option",
+                "D. ${questionModel.option4}",
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.black54,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              padding: EdgeInsets.all(14),
-              margin: EdgeInsets.symmetric(horizontal: 17, vertical: 5),
-              decoration: BoxDecoration(
-                color: Colors.red.withAlpha(150),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: Text(
-                "D. Forth Option",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black54,
+                  color: Colors.white70,
                   fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.center,

@@ -2,8 +2,12 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 
+import 'package:kbc_app_yt/views/question.dart';
+
 class Win extends StatefulWidget {
-  const Win({super.key});
+  int queMoney;
+  String QuizID;
+  Win(this.queMoney, this.QuizID);
 
   @override
   State<Win> createState() => _WinState();
@@ -42,11 +46,13 @@ class _WinState extends State<Win> {
                   Text("Your answer is correct",style: TextStyle(color: Colors.white,fontSize: 16, fontWeight: FontWeight.w500),),
                   SizedBox(height: 15,),
                   Text("You won ", style: TextStyle(color: Colors.white),),
-                  Text("Rs.50,000",style: TextStyle(color: Colors.white,fontSize: 34, fontWeight: FontWeight.w500),),
+                  Text("Rs. ${widget.queMoney}",style: TextStyle(color: Colors.white,fontSize: 34, fontWeight: FontWeight.w500),),
                   Container(
                     padding: EdgeInsets.all(20),
                       child: Image.asset("assets/images/cheque.jpg")),
-                  ElevatedButton(onPressed: (){}, child: Text("Next Question"))
+                  ElevatedButton(onPressed: (){
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Question(quizID: widget.QuizID, queMoney: (widget.queMoney)*2)));
+                  }, child: Text("Next Question"))
                 ],
               ),
             ),

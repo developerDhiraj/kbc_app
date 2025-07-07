@@ -18,7 +18,7 @@ class FireDB {
         "name": name,
         "email": email,
         "photoUrl": photoUrl,
-        "money": "0",
+        "money": 0,
         "rank": "NA",
         "level": "0"
       })
@@ -31,76 +31,50 @@ class FireDB {
         print("❌ Firestore error: $e");
       });
     }
-
-    // if (await getUser()) {
-    //   print("User already exist");
-    // } else {
-    //   await FirebaseFirestore.instance
-    //       .collection("users")
-    //       .doc(current_user!.uid)
-    //       .set({
-    //         "name": name,
-    //         "email": email,
-    //         "photoUrl": photoUrl,
-    //         "money": "0",
-    //          "rank" : "NA",
-    //           "level" : "0"
-    //       })
-    //       .then((value) async{
-    //         await LocalDB.saveMoney("0");
-    //         await LocalDB.saveRank("NA");
-    //         await LocalDB.saveLevel("0");
-    //         print("User Register Succcesfully");
-    //       });
-    // }
   }
+
+  static  updateMoney(int amount) async{
+    final FirebaseAuth _myauth = FirebaseAuth.instance;
+    await FirebaseFirestore.instance.collection("users").doc(_myauth.currentUser!.uid).get().then((value) async{
+      await LocalDB.saveMoney((value.data()!["money"] + amount).toString());
+      await FirebaseFirestore.instance.collection("users").doc(_myauth.currentUser!.uid).update(
+          {"money" : value.data()!["money"] + amount}
+      );
+    });
+  }
+
 
   Future<bool> getUser() async {
     final User? current_user = _auth.currentUser;
-    String user = "";
 
+    if (current_user == null) return false;
+    print(current_user.uid);
 
-    if (user.toString() == "null") {
+    final doc = await FirebaseFirestore.instance
+        .collection("users")
+        .doc(current_user.uid)
+        .get();
+
+    if (!doc.exists) {
+      print("⚠️ User document not found.");
+
       return false;
-    } else {
-      await FirebaseFirestore.instance
-          .collection("users")
-          .doc(current_user!.uid)
-          .get()
-          .then((value) async {
-        user = value.data().toString();
-        await LocalDB.saveMoney(value["money"]);
-        await LocalDB.saveRank(value["rank"]);
-        await LocalDB.saveLevel(value["level"]);
-
-      });
-      return true;
     }
+
+    final data = doc.data();
+    if (data == null) {
+      print("⚠️ User document exists but data is null.");
+      return false;
+    }
+
+    if (data != null) {
+      await LocalDB.saveMoney(data["money"]);
+      await LocalDB.saveRank(data["rank"]);
+      await LocalDB.saveLevel(data["level"]);
+      print("User document exists and fetching the data");
+    }
+
+    return true;
   }
-
-
-  // Future<bool> getUser() async {
-  //   final User? current_user = _auth.currentUser;
-  //
-  //   if (current_user == null) return false;
-  //
-  //   final doc = await FirebaseFirestore.instance
-  //       .collection("users")
-  //       .doc(current_user.uid)
-  //       .get();
-  //
-  //   if (!doc.exists) {
-  //     return false;
-  //   }
-  //
-  //   final data = doc.data();
-  //   if (data != null) {
-  //     await LocalDB.saveMoney(data["money"]);
-  //     await LocalDB.saveRank(data["rank"]);
-  //     await LocalDB.saveLevel(data["level"]);
-  //   }
-  //
-  //   return true;
-  // }
 
 }

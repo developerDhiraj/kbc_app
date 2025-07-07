@@ -1,17 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:kbc_app_yt/services/localdb.dart';
 
-class CheckQuizUnlock{
-  static Future<bool> checkQuizUnlockStatus(String quiz_doc_id)async {
-  String? user_id = "";
-  bool unlocked = false;
-  await LocalDB.getUserID().then((value){
-    user_id = value;
-  });
-  await FirebaseFirestore.instance.collection("users").doc(user_id).collection("unlocked_quiz").doc(quiz_doc_id).get().then((value){
-  unlocked = value.data().toString() != "null";
-  });
-  return unlocked;
+class CheckQuizUnlock {
+  static Future<bool> checkQuizUnlockStatus(String quiz_doc_id) async {
+    String? user_id = await LocalDB.getUserID();
+
+    final docSnapshot = await FirebaseFirestore.instance
+        .collection("users")
+        .doc(user_id)
+        .collection("unlocked_quiz")
+        .doc(quiz_doc_id)
+        // .doc("NjyQj0l3kUCjJkkfZbdj")
+        .get();
+    print("In file checkQuizUnlock, the quiz_doc_id : $quiz_doc_id");
+
+
+    return docSnapshot.exists;
   }
 }

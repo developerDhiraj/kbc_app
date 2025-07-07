@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:kbc_app_yt/services/home_fire.dart';
 import 'package:kbc_app_yt/views/quizintro.dart';
 import 'package:kbc_app_yt/widgets/sidenevbar.dart';
 
+import '../services/home_fire.dart' as HomeFire;
 import '../services/localdb.dart';
 
 class Home extends StatefulWidget {
@@ -48,19 +51,39 @@ class _HomeState extends State<Home> {
       });
     });
   }
-  getquiz() async {
-    await HomeFire.getquizzes().then((returend_quizzes){
-      setState(() {
-        quizzes = returend_quizzes;
-      });
+
+  Future<void> getAllQuizzesAndCheckUnlock() async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+
+    final quizSnapshot = await FirebaseFirestore.instance.collection('quizzes').get();
+    final unlockedSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('unlocked_quiz')
+        .get();
+
+    final unlockedIds = unlockedSnapshot.docs.map((doc) => doc.id).toSet();
+
+    final quizList = quizSnapshot.docs.map((doc) {
+      final data = doc.data();
+      data['quizId'] = doc.id;
+      data['isUnlocked'] = unlockedIds.contains(doc.id); // 👈
+      return data;
+    }).toList();
+
+    setState(() {
+      quizzes = quizList;
+      print("this is the AI data $quizzes");
     });
   }
+
   @override
   void initState() {
     super.initState();
     getUserDet();
-    getquiz();
+    getAllQuizzesAndCheckUnlock();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -290,51 +313,73 @@ class _HomeState extends State<Home> {
                   ),
                 ],
               ),
-
               Container(
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                child: Row(
+                child:
+                Row(
                   children: [
-                    Flexible(
-                      flex: 1,
-                      fit: FlexFit.tight,
-                      child: quizzes.length > 1
-                          ? InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => QuizIntro(
-                                quizAbout: quizzes[1]["about"],
-                                quizImgUrl: quizzes[1]["url_pic"],
-                                quizTopics: quizzes[1]["topics"],
-                                quizName: quizzes[1]["quiz_name"],
-                                quizDuration: quizzes[1]["duration"],
-                                QuizId: quizzes[1]["Quizid"],
-                              ),
-                            ),
-                          );
-                        },
-                        child: Stack(
-                          children: [
-                            Card(
-                              elevation: 8,
-                              child: Container(
-                                child: Image.network(
-                                  quizzes[1]["url_pic"],
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                          ],
+                    // Left Quiz Card - from quizzes[1] if it exists
+                  Flexible(
+                  flex: 1,
+                  fit: FlexFit.tight,
+                  child: quizzes.length > 1 && quizzes[1] != null
+                      ? InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QuizIntro(
+                            quizAbout: quizzes[1]["about"] ?? "",
+                            quizImgUrl: quizzes[1]["url_pic"] ?? "",
+                            quizTopics: quizzes[1]["topics"] ?? "",
+                            quizName: quizzes[1]["quiz_name"] ?? "",
+                            quizDuration: quizzes[1]["duration"] ?? "",
+                            QuizId: quizzes[1]["quizId"] ?? "", // 🔧 Note: key should be quizId not Quizid
+                            QuizPrice: quizzes[1]["unlock_money"].toString(),
+                          ),
                         ),
-                      )
-                          : Center(
-                        child: CircularProgressIndicator(),
+                      );
+                    },
+                    child: Stack(
+                      children: [
+                        Card(
+                          elevation: 8,
+                          child: Container(
+                            height: 130,
+                            child: Image.network(
+                              quizzes[1]["url_pic"] ?? "",
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: Colors.grey[300],
+                                  child: Center(
+                                    child: Icon(Icons.broken_image, size: 40),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                      : Card(
+                    elevation: 8,
+                    child: Container(
+                      height: 130,
+                      color: Colors.grey[200],
+                      child: Center(
+                        child: Text(
+                          "No quiz found",
+                          style: TextStyle(color: Colors.grey),
+                        ),
                       ),
                     ),
+                  ),
+                ),
+                  SizedBox(width: 10),
 
-                    SizedBox(width: 10),
+                    // Right Static Image Card
                     Flexible(
                       flex: 1,
                       fit: FlexFit.tight,
@@ -343,9 +388,18 @@ class _HomeState extends State<Home> {
                           Card(
                             elevation: 8,
                             child: Container(
+                              height: 130,
                               child: Image.network(
                                 "https://images.unsplash.com/photo-1747956895655-163ff55bdc6e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                                 fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: Colors.grey[300],
+                                    child: Center(
+                                      child: Icon(Icons.broken_image, size: 40),
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                           ),
@@ -353,7 +407,7 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                   ],
-                ),
+                )
               ),
               Container(
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),

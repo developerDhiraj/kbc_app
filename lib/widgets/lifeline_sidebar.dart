@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class Lifeline_Drawer extends StatefulWidget {
@@ -140,7 +142,7 @@ class _Lifeline_DrawerState extends State<Lifeline_Drawer> {
                     shrinkWrap: true,
                       reverse: true,
                       itemCount: 13, itemBuilder: (context, index){
-                    return ListTile( leading: Text("${index+1}.", style: TextStyle(fontSize: 20, color: Colors.grey),),title: Text("Rs. ${(index+1)*5000}", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),trailing: Icon(Icons.circle),);
+                    return ListTile( leading: Text("${index+1}.", style: TextStyle(fontSize: 20, color: Colors.grey),),title: Text("Rs. ${2500*(pow(2, index+1))}", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),trailing: Icon(Icons.circle),);
                   }),
                 ),
               ),
