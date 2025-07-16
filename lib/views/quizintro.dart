@@ -5,6 +5,8 @@ import 'package:kbc_app_yt/services/quizQueCreator.dart';
 import 'package:kbc_app_yt/views/checkQuizUnlock.dart';
 import 'package:kbc_app_yt/views/question.dart';
 
+import '../services/localdb.dart';
+
 class QuizIntro extends StatefulWidget {
   String quizName;
   String quizImgUrl;
@@ -28,7 +30,15 @@ class QuizIntro extends StatefulWidget {
 }
 
 class _QuizIntroState extends State<QuizIntro> {
-    bool quizIsUnlock = false;
+  setLifeLAvail()async{
+    await LocalDB.saveAud(true);
+    await LocalDB.saveJoker(true);
+    await LocalDB.save50(true);
+    await LocalDB.saveExp(true);
+    Navigator.push(context, MaterialPageRoute(builder: (context)=>Question(quizID: widget.QuizId, queMoney: 5000)));
+  }
+
+  bool quizIsUnlock = false;
     getAllQuizzesAndCheckUnlock() async {
     await CheckQuizUnlock.checkQuizUnlockStatus(widget.QuizId).then((unlockStatus){
       print("In quizintro : Unlock status for ${widget.QuizId} is: $unlockStatus");
@@ -43,6 +53,7 @@ class _QuizIntroState extends State<QuizIntro> {
     // TODO: implement initState
     super.initState();
     getAllQuizzesAndCheckUnlock();
+
   }
 
   @override
@@ -57,8 +68,8 @@ class _QuizIntroState extends State<QuizIntro> {
           // print("Quiz is already Unlocked")
           // await QuizQueCreator.genQuizQue(widget.QuizId, 6000)
           // print("Navigate to Question Page")
-          Navigator.push(context, MaterialPageRoute(builder: (context)=>Question(quizID: widget.QuizId, queMoney: 6000)))
-              : QuizDhandha.buyQuiz(QuizPrice : int.parse(widget.QuizPrice), QuizID : widget.QuizId).then((quizKharidLiya){
+
+          setLifeLAvail(): QuizDhandha.buyQuiz(QuizPrice : int.parse(widget.QuizPrice), QuizID : widget.QuizId).then((quizKharidLiya){
             if(quizKharidLiya){
               setState(() {
                 quizIsUnlock = true;

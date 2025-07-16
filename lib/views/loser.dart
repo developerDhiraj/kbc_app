@@ -24,11 +24,11 @@ Looser({required this.wonMon, required this.correctAns});
                   Text("The answer is ${correctAns}",style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),),
                   SizedBox(height: 15,),
                   Text("You won ",),
-                  Text("Rs. ${wonMon}",style: TextStyle(fontSize: 34, fontWeight: FontWeight.w500),),
+                  Text("Rs. ${wonMon == 2500 ? 0 : wonMon}",style: TextStyle(fontSize: 34, fontWeight: FontWeight.w500),),
                   Icon(Icons.error_outline,size: 50,color: Colors.red,),
-
-
-                  ElevatedButton(onPressed: (){}, child: Text("Go To Rewards"))
+                  ElevatedButton(onPressed: (){
+                    Navigator.pop(context);
+                  }, child: Text("Go To Rewards"))
                 ],
               ),
 

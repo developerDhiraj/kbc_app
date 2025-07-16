@@ -6,6 +6,7 @@ import 'package:kbc_app_yt/services/quizQueCreator.dart';
 import 'package:kbc_app_yt/views/win.dart';
 import 'package:kbc_app_yt/widgets/lifeline_sidebar.dart';
 
+import '../services/localdb.dart';
 import 'loser.dart';
 
 class Question extends StatefulWidget {
@@ -66,8 +67,16 @@ class _QuestionState extends State<Question> {
     // TODO: implement initState
     super.initState();
     genQue();
+    // setLifeLAvail();
     print("this is data from initState $genQue");
   }
+  //
+  // setLifeLAvail()async{
+  //   await LocalDB.saveAud(true);
+  //   await LocalDB.saveJoker(true);
+  //   await LocalDB.save50(true);
+  //   await LocalDB.saveExp(true);
+  // }
 
   bool optALocked = false;
   bool optBLocked = false;
@@ -86,7 +95,7 @@ class _QuestionState extends State<Question> {
           title: Text("Rs ${widget.queMoney}", style: TextStyle(fontSize: 25)),
           centerTitle: true,
         ),
-        drawer: Lifeline_Drawer(),
+        drawer: Lifeline_Drawer(question: questionModel.question,opt1: questionModel.option1, opt2: questionModel.option2,opt3: questionModel.option3, opt4: questionModel.option4,correctAns: questionModel.correctAnswer,quizID: widget.quizID,currentQueMon: widget.queMoney,),
         floatingActionButton: ElevatedButton(
           onPressed: () {},
           child: Text("Quit Game"),
@@ -127,9 +136,6 @@ class _QuestionState extends State<Question> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-
-
-
                 questionModel.question,
                 style: TextStyle(fontSize: 20),
                 textAlign: TextAlign.center,
@@ -144,7 +150,7 @@ class _QuestionState extends State<Question> {
                   optALocked = true;
                 });
                 Future.delayed(Duration(seconds: 2),()async{
-                  if(questionModel.option4 == questionModel.correctAnswer){
+                  if(questionModel.option1 == questionModel.correctAnswer){
                     print("Badhiya Hai yaar");
                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> Win(widget.queMoney, widget.quizID)));
                   }else{
@@ -173,58 +179,118 @@ class _QuestionState extends State<Question> {
                 ),
               ),
             ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              padding: EdgeInsets.all(14),
-              margin: EdgeInsets.symmetric(horizontal: 17, vertical: 5),
-              decoration: BoxDecoration(
-                color: Colors.purple.withAlpha(150),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: Text(
-                "B. ${questionModel.option2}",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white70,
-                  fontWeight: FontWeight.bold,
+            InkWell(
+              onTap: (){
+                print("Double tab to lock the screen");
+              },
+              onLongPress: (){
+                setState(() {
+                  optBLocked = true;
+                });
+                Future.delayed(Duration(seconds: 2),()async{
+                  if(questionModel.option2 == questionModel.correctAnswer){
+                    print("Badhiya Hai yaar");
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> Win(widget.queMoney, widget.quizID)));
+                  }else{
+                    await FireDB.updateMoney(widget.queMoney~/2);
+                    print("Bada dukh hua dekh kar");
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> Looser(wonMon: widget.queMoney~/2,correctAns: questionModel.correctAnswer,)));
+                  }
+                });
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                padding: EdgeInsets.all(14),
+                margin: EdgeInsets.symmetric(horizontal: 17, vertical: 5),
+                decoration: BoxDecoration(
+                  color: optBLocked ? Colors.yellow.withAlpha(150) : Colors.purple.withAlpha(150),
+                  borderRadius: BorderRadius.circular(30),
                 ),
-                textAlign: TextAlign.center,
+                child:Text(
+                  "B. ${questionModel.option2}",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white70,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              padding: EdgeInsets.all(14),
-              margin: EdgeInsets.symmetric(horizontal: 17, vertical: 5),
-              decoration: BoxDecoration(
-                color: Colors.purple.withAlpha(150),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: Text(
-                "C. ${questionModel.option3}",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white70,
-                  fontWeight: FontWeight.bold,
+            InkWell(
+              onTap: (){
+                print("Double tab to lock the screen");
+              },
+              onLongPress: (){
+                setState(() {
+                  optCLocked = true;
+                });
+                Future.delayed(Duration(seconds: 2),()async{
+                  if(questionModel.option3 == questionModel.correctAnswer){
+                    print("Badhiya Hai yaar");
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> Win(widget.queMoney, widget.quizID)));
+                  }else{
+                    await FireDB.updateMoney(widget.queMoney~/2);
+                    print("Bada dukh hua dekh kar");
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> Looser(wonMon: widget.queMoney~/2,correctAns: questionModel.correctAnswer,)));
+                  }
+                });
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                padding: EdgeInsets.all(14),
+                margin: EdgeInsets.symmetric(horizontal: 17, vertical: 5),
+                decoration: BoxDecoration(
+                  color: optCLocked ? Colors.yellow.withAlpha(150) : Colors.purple.withAlpha(150),
+                  borderRadius: BorderRadius.circular(30),
                 ),
-                textAlign: TextAlign.center,
+                child:Text(
+                  "C. ${questionModel.option3}",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white70,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              padding: EdgeInsets.all(14),
-              margin: EdgeInsets.symmetric(horizontal: 17, vertical: 5),
-              decoration: BoxDecoration(
-                color: Colors.purple.withAlpha(150),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: Text(
-                "D. ${questionModel.option4}",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white70,
-                  fontWeight: FontWeight.bold,
+            InkWell(
+              onTap: (){
+                print("Double tab to lock the screen");
+              },
+              onLongPress: (){
+                setState(() {
+                  optDLocked = true;
+                });
+                Future.delayed(Duration(seconds: 2),()async{
+                  if(questionModel.option4 == questionModel.correctAnswer){
+                    print("Badhiya Hai yaar");
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> Win(widget.queMoney, widget.quizID)));
+                  }else{
+                    await FireDB.updateMoney(widget.queMoney~/2);
+                    print("Bada dukh hua dekh kar");
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> Looser(wonMon: widget.queMoney~/2,correctAns: questionModel.correctAnswer,)));
+                  }
+                });
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                padding: EdgeInsets.all(14),
+                margin: EdgeInsets.symmetric(horizontal: 17, vertical: 5),
+                decoration: BoxDecoration(
+                  color: optDLocked ? Colors.yellow.withAlpha(150) : Colors.purple.withAlpha(150),
+                  borderRadius: BorderRadius.circular(30),
                 ),
-                textAlign: TextAlign.center,
+                child:Text(
+                  "D. ${questionModel.option4}",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white70,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
           ],

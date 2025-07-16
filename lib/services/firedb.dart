@@ -8,6 +8,7 @@ class FireDB {
     final User? current_user = _auth.currentUser;
     print("Checking if user exists...");
     if (await getUser()) {
+      await FireDB().getUser();
       print("User already exists, not creating again.");
     } else {
       print("Creating new user document...");
@@ -34,13 +35,15 @@ class FireDB {
   }
 
   static  updateMoney(int amount) async{
-    final FirebaseAuth _myauth = FirebaseAuth.instance;
-    await FirebaseFirestore.instance.collection("users").doc(_myauth.currentUser!.uid).get().then((value) async{
-      await LocalDB.saveMoney((value.data()!["money"] + amount).toString());
-      await FirebaseFirestore.instance.collection("users").doc(_myauth.currentUser!.uid).update(
-          {"money" : value.data()!["money"] + amount}
-      );
-    });
+    if (amount != 2500){
+      final FirebaseAuth _myauth = FirebaseAuth.instance;
+      await FirebaseFirestore.instance.collection("users").doc(_myauth.currentUser!.uid).get().then((value) async{
+        await LocalDB.saveMoney((value.data()!["money"] + amount).toString());
+        await FirebaseFirestore.instance.collection("users").doc(_myauth.currentUser!.uid).update(
+            {"money" : value.data()!["money"] + amount}
+        );
+      });
+    }
   }
 
 
@@ -49,6 +52,7 @@ class FireDB {
 
     if (current_user == null) return false;
     print(current_user.uid);
+
 
     final doc = await FirebaseFirestore.instance
         .collection("users")
@@ -68,10 +72,19 @@ class FireDB {
     }
 
     if (data != null) {
-      await LocalDB.saveMoney(data["money"]);
-      await LocalDB.saveRank(data["rank"]);
-      await LocalDB.saveLevel(data["level"]);
-      print("User document exists and fetching the data");
+      // await LocalDB.saveMoney(data["money"]);
+      // await LocalDB.saveRank(data["rank"]);
+      // await LocalDB.saveLevel(data["level"]);
+      //
+      // await LocalDB.saveName(data["name"]);
+      // await LocalDB.saveUrl(data["photoUrl"]);
+      await LocalDB.saveMoney(data["money"].toString());
+      await LocalDB.saveRank(data["rank"].toString());
+      await LocalDB.saveLevel(data["level"].toString());
+      await LocalDB.saveName(data["name"].toString());
+      await LocalDB.saveUrl(data["photoUrl"].toString());
+
+      print("✅ User document exists and data saved locally.");
     }
 
     return true;

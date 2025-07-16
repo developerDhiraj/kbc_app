@@ -7,6 +7,10 @@ class LocalDB {
   static final pKey = "sdjkdsfkjdsfkj";
   static final lKey = "dsjkdsdsfkfl";
   static final rKey = "fsdjkfdslkds";
+  static final AudKey = "fsdjkfsfsfddslkds";
+  static final JokKey = "fsdjksdfsdfkds";
+  static final F50Key = "fsafsafasafkds";
+  static final ExpKey = "fsdjksfsdfweweds";
 
   static Future<bool> saveUserID(String uid) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -66,5 +70,55 @@ class LocalDB {
   static Future<String?> getRank() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return await preferences.getString(rKey);
+  }
+
+
+  static Future<bool?> saveAud(bool IsAvail) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    return await preferences.setBool(AudKey, IsAvail);
+  }
+  static Future<bool?> getAud() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    return await preferences.getBool(AudKey);
+  }
+
+  static Future<bool?> saveJoker(bool IsAvail) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    return await preferences.setBool(JokKey, IsAvail);
+  }
+  static Future<bool?> getJoker() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    return await preferences.getBool(JokKey);
+  }
+
+  static Future<bool?> save50(bool IsAvail) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    return await preferences.setBool(F50Key, IsAvail);
+  }
+  static Future<bool?> get50() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    return await preferences.getBool(F50Key);
+  }
+
+  static Future<bool?> saveExp(bool IsAvail) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    return await preferences.setBool(ExpKey, IsAvail);
+  }
+  static Future<bool?> getExp() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    return await preferences.getBool(ExpKey);
+  }
+
+
+
+
+  static Future<void> clearAll() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    await preferences.remove(uidKey);
+    await preferences.remove(mKey);
+    await preferences.remove(nKey);
+    await preferences.remove(pKey);
+    await preferences.remove(lKey);
+    await preferences.remove(rKey);
   }
 }

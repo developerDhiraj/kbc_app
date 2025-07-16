@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kbc_app_yt/services/localdb.dart';
 import 'package:kbc_app_yt/views/home.dart';
@@ -104,13 +105,25 @@ class SideNav extends StatelessWidget {
               label: "About Us",
               icon: Icons.face,
             ),
+            // listItem(
+            //   context: context,
+            //   path: MaterialPageRoute(
+            //     builder: (BuildContext context) => Login(),
+            //   ),
+            //   label: "Logout",
+            //   icon: Icons.logout,
+            // ),
             listItem(
               context: context,
-              path: MaterialPageRoute(
-                builder: (BuildContext context) => Login(),
-              ),
               label: "Logout",
               icon: Icons.logout,
+              path: MaterialPageRoute(
+                builder: (BuildContext context) {
+                  FirebaseAuth.instance.signOut();
+                  LocalDB.clearAll();
+                  return Login();
+                },
+              ),
             ),
           ],
         ),
